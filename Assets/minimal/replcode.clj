@@ -2,18 +2,20 @@
 (log "Hello, Arcadia!")
 
 ;; Reload everything
-(do
+(d
   (require '[arcadia.core :reload :all])
   (require '[arcadia.linear :reload :all])
   (require '[minimal.mmo  :reload :all])
-  (require '[minimal.core :reload :all]))
+  (require '[minimal.core :reload :all])
+  (require '[minimal.benchmark :reload :all]))
 
 ;; Load everything
 (do
   (require '[arcadia.core :refer :all])
   (require '[arcadia.linear :refer :all])
   (require '[minimal.mmo  :refer :all])
-  (require '[minimal.core :refer :all]))
+  (require '[minimal.core :refer :all])
+  (require '[minimal.benchmark :refer :all]))
 
 (require '[ :refer :all])
 (require '[ :reload :all])
