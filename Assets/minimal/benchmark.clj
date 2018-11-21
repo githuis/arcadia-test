@@ -138,15 +138,36 @@
   (let [d (* 1.1 (bit-and i 0xFF))]
     (Mathf/Pow d 20)))
 
-(defn primes [i]
+(defn prime-helper [realN i]
+  (let [iPow (Mathf/Floor (Mathf/Pow i 2))]
+    (loop [j 0
+           nu 0]
+      (when (< j realN)
+        (stateUpdate (into-array (assoc (vec (stateGet :A)) i false)) :A)
+        ;;(log "i:" i "  ipow:" iPow "  j:" j "  num:" nu "  inc: " (+ iPow (* i (+ nu 1))))
+        (recur (+ iPow (* i (+ nu 1))) (inc nu))
+        ))
+    ))
+
+(defn primes [number]
   (let [realNumber 100
         tar (object-named "Main Camera")]
     (do
-      (stateUpdate :A (boolean-array (+ realNumber 1)))
-      (log (stateGet :A))
-      (log (stateGet :runningTime))
-      )
-    ))
+      (stateUpdate (boolean-array (+ realNumber 1) true) :A)
+      (loop [i 2]
+        (when (< i (Mathf/Sqrt realNumber))
+          (when (nth (stateGet :A) i)
+            (prime-helper realNumber i))))
+      (loop [inew 2
+             primes []]
+        (if (< inew (alength (stateGet :A)))
+          (if (nth (stateGet :A) inew)
+            (recur (inc inew) (conj primes inew))
+            (recur (inc inew) primes))
+          (bit-and (last primes) number))))))
+
+
+;;  (for [x (range 0 101) :while (< x (Mathf/Sqrt 100)) :let [y (+ 5 x)]] y)
 
 (defn memtest [i]
   (bit-and (alength (int-array 100000)) i))
@@ -175,6 +196,6 @@
       (mark8 "Dot3d" dot3d 5 0.250)
       (mark8 "Sestoft" sestoft 5 0.250)
       (mark8 "SestoftPow" sestoftpow 5 0.250)
+      (mark8 "Primes" primes 5 0.250)
       (mark8 "Memtest" memtest 5 0.250)
-      (primes 5)
       (log "Done running Test"))))
