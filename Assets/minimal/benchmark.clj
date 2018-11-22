@@ -1,6 +1,7 @@
 ;; We import all the necessary unity items and arcadia functions
 (ns minimal.benchmark
-  (:import [UnityEngine Input KeyCode Camera Physics Time Resources GameObject Vector2 Vector3 Transform Quaternion Rigidbody2D Physics2D Mathf])
+  (:import [System.IO File]
+           [UnityEngine Input KeyCode Camera Physics Time Resources GameObject Vector2 Vector3 Transform Quaternion Rigidbody2D Physics2D Mathf])
   (:use arcadia.core arcadia.linear))
 
 
@@ -44,6 +45,16 @@
   (let [tar (object-named "Main Camera")]
     (state tar varName)))
 
+(defn resultOutput [msg mean std sCount]
+  (File/AppendAllText "out.txt" (format "%s,%f,%f,%d\n" msg (float mean) (float std) sCount)))
+
+(def createOutput
+    (File/WriteAllText "out.txt" "Msg, Mean, Deviation, Count\n"))
+
+(def testDuration
+  0.250)
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Mark 8 function
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -75,7 +86,9 @@
                   (stateAddUpdate (state tar :sCount) :totalCount)
                   (let [mean (/ (state tar :deltaTime) iterations)]
                     (let [stddev (Mathf/Sqrt (/  (- (state tar :deltaTimeSquared) (* mean (* iterations mean))) (- iterations 1) ))]
-                      (log msg mean stddev (state tar :sCount)))
+                      (resultOutput msg mean stddev (stateGet :sCount))
+                      ;;(log "test")
+                      )
                     )
 
                   )
@@ -144,7 +157,6 @@
            nu 0]
       (when (< j realN)
         (stateUpdate (into-array (assoc (vec (stateGet :A)) i false)) :A)
-        ;;(log "i:" i "  ipow:" iPow "  j:" j "  num:" nu "  inc: " (+ iPow (* i (+ nu 1))))
         (recur (+ iPow (* i (+ nu 1))) (inc nu))
         ))
     ))
@@ -180,22 +192,21 @@
 (defn run-tests-on-press [o,id]
   (when (Input/GetKeyDown KeyCode/Space)
     (do
-      (log "Msg\tMean\tDev\tCount")
-      (mark8 "hi" funtest 5 0.250)
-      (mark8 "Scale2d" scale2d 5 0.250)
-      (mark8 "Scale3d" scale3d 5 0.250)
-      (mark8 "Multiply2d" multiply2d 5 0.250)
-      (mark8 "Multiply3d" multiply3d 5 0.250)
-      (mark8 "Translate2d" translate2d 5 0.250)
-      (mark8 "Translate3d" translate3d 5 0.250)
-      (mark8 "Subtract2d" subtract2d 5 0.250)
-      (mark8 "Subtract3d" subtract3d 5 0.250)
-      (mark8 "Length2d" length2d 5 0.250)
-      (mark8 "Length3d" length3d 5 0.250)
-      (mark8 "Dot2d" dot2d 5 0.250)
-      (mark8 "Dot3d" dot3d 5 0.250)
-      (mark8 "Sestoft" sestoft 5 0.250)
-      (mark8 "SestoftPow" sestoftpow 5 0.250)
-      (mark8 "Primes" primes 5 0.250)
-      (mark8 "Memtest" memtest 5 0.250)
-      (log "Done running Test"))))
+      (log "Starting tests..")
+      (mark8 "Scale2d" scale2d 5 testDuration)
+      (mark8 "Scale3d" scale3d 5 testDuration)
+      (mark8 "Multiply2d" multiply2d 5 testDuration)
+      (mark8 "Multiply3d" multiply3d 5 testDuration)
+      (mark8 "Translate2d" translate2d 5 testDuration)
+      (mark8 "Translate3d" translate3d 5 testDuration)
+      (mark8 "Subtract2d" subtract2d 5 testDuration)
+      (mark8 "Subtract3d" subtract3d 5 testDuration)
+      (mark8 "Length2d" length2d 5 testDuration)
+      (mark8 "Length3d" length3d 5 testDuration)
+      (mark8 "Dot2d" dot2d 5 testDuration)
+      (mark8 "Dot3d" dot3d 5 testDuration)
+      (mark8 "Sestoft" sestoft 5 testDuration)
+      (mark8 "SestoftPow" sestoftpow 5 testDuration)
+      (mark8 "Primes" primes 5 testDuration)
+      (mark8 "Memtest" memtest 5 testDuration)
+      (log "Done running Tests"))))

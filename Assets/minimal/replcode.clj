@@ -2,7 +2,7 @@
 (log "Hello, Arcadia!")
 
 ;; Reload everything
-(d
+(do
   (require '[arcadia.core :reload :all])
   (require '[arcadia.linear :reload :all])
   (require '[minimal.mmo  :reload :all])
